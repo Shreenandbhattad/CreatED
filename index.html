@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+  <title>Student Submission Tracker</title>
+  <style>
+    :root {
+      --primary-color: #0071e3;
+      --bg-color: #f5f5f7;
+      --surface-color: #ffffff;
+      --text-color: #111111;
+      --muted-color: #6c6c6c;
+      --radius-lg: 1rem;
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.1);
+      --transition: 0.3s ease;
+      font-size: 16px;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text-color);
+      background-color: var(--bg-color);
+      line-height: 1.6;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      background: var(--surface-color);
+      box-shadow: var(--shadow-lg);
+      z-index: 10;
+    }
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-color);
+      text-decoration: none;
+    }
+    .nav-links a {
+      margin-left: 2rem;
+      font-size: 1rem;
+      color: var(--text-color);
+      text-decoration: none;
+      position: relative;
+      transition: color var(--transition);
+    }
+    .nav-links a:hover {
+      color: var(--primary-color);
+    }
+    .nav-links a::after {
+      content: '';
+      display: block;
+      margin: .25rem auto 0;
+      width: 0;
+      height: 2px;
+      background: var(--primary-color);
+      transition: width var(--transition);
+    }
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+    section {
+      padding: 4rem 1rem;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .hero {
+      min-height: 60vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    .hero p {
+      font-size: 1.125rem;
+      color: var(--muted-color);
+    }
+    .content-card {
+      background: var(--surface-color);
+      padding: 2.5rem;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      margin-top: 2rem;
+      transition: transform var(--transition);
+    }
+    .content-card:hover {
+      transform: translateY(-4px);
+    }
+    .content-card h2 {
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    .table th, .table td {
+      padding: .75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: .5rem;
+      font-weight: 500;
+    }
+    .form-control, .form-select, .form-file {
+      width: 100%;
+      padding: .75rem 1rem;
+      font-size: 1rem;
+      border: 1px solid #d0d0d0;
+      border-radius: .5rem;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .form-control:focus, .form-select:focus, .form-file:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(0,113,227,0.2);
+    }
+    .btn {
+      display: inline-block;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: .75rem 1.75rem;
+      border: none;
+      border-radius: 2rem;
+      cursor: pointer;
+      transition: background-color var(--transition), transform var(--transition);
+      text-decoration: none;
+      text-align: center;
+      background-color: var(--primary-color);
+      color: #fff;
+    }
+    .btn:hover {
+      background-color: darken(var(--primary-color), 10%);
+      transform: translateY(-2px);
+    }
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--muted-color);
+      font-size: .875rem;
+    }
+    @media (min-width: 768px) {
+      .hero h1 { font-size: 3.5rem; }
+      .hero p { font-size: 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="nav-container">
+      <a href="#" class="nav-brand">SubmissionTracker</a>
+      <nav class="nav-links">
+        <a href="#tasks">Tasks</a>
+        <a href="#submission">Submit Work</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container">
+        <h1>CreatED WorkTrack</h1>
+        <p>View your tasks, check deadlines, and submit your assignments.</p>
+      </div>
+    </section>
+
+    <!-- Tasks Section -->
+    <section id="tasks">
+      <div class="container">
+        <div class="content-card">
+          <h2>Assigned Tasks</h2>
+          <table class="table" id="tasksTable">
+            <thead>
+              <tr>
+                <th>Task Name</th>
+                <th>Deadline</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- JS will inject rows here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Submission Section -->
+    <section id="submission">
+      <div class="container">
+        <div class="content-card">
+          <h2>Upload Your Work</h2>
+          <form id="submissionForm" novalidate>
+            <div class="form-group">
+              <label for="studentName">Name</label>
+              <input id="studentName" class="form-control" type="text" placeholder="Shreenand Bhattad" required>
+            </div>
+            <div class="form-group">
+              <label for="studentEmail">Email</label>
+              <input id="studentEmail" class="form-control" type="email" placeholder="bhattad.shreenand@gmail.com" required>
+            </div>
+            <div class="form-group">
+              <label for="taskSelect">Select Task</label>
+              <select id="taskSelect" class="form-select" required>
+                <option value="">— Choose a Task —</option>
+                <!-- JS will inject options -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="fileInput">Select File</label>
+              <input id="fileInput" class="form-file" type="file" required>
+            </div>
+            <button type="submit" class="btn">Submit Work</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    &copy; <span id="currentYear"></span> Your Institution. All rights reserved.
+  </footer>
+
+  <script>
+    // === PLACEHOLDER: Insert your Google Apps Script Web App URL below ===
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz1u9TqDR19ZrcssLS6bZcG_0L31dHRY5CBeP_UhBM5WpmPwOXy0jP9GIlwiKe8BuD3/exec';
+
+    // Set footer year
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+    // Fetch & render tasks
+    async function fetchTasks() {
+      try {
+        const res = await fetch(\`\${APPS_SCRIPT_URL}?action=getTasks\`);
+        const { tasks } = await res.json();
+        const tbody = document.querySelector('#tasksTable tbody');
+        tbody.innerHTML = '';
+        tasks.forEach(t => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = \`
+            <td>\${t.name}</td>
+            <td>\${new Date(t.deadline).toLocaleDateString()}</td>
+            <td>\${t.status}</td>
+          \`;
+          tbody.appendChild(tr);
+        });
+        populateTaskSelect(tasks);
+      } catch (e) {
+        console.error('Error loading tasks:', e);
+      }
+    }
+
+    // Populate task dropdown
+    function populateTaskSelect(tasks) {
+      const select = document.getElementById('taskSelect');
+      tasks.forEach((t, i) => {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = \`\${t.name} (Due: \${new Date(t.deadline).toLocaleDateString()})\`;
+        select.appendChild(opt);
+      });
+    }
+
+    // Handle form submission
+    document.getElementById('submissionForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const name  = e.target.studentName.value.trim();
+      const email = e.target.studentEmail.value.trim();
+      const taskIndex = e.target.taskSelect.value;
+      const file = e.target.fileInput.files[0];
+      if (!name || !email || !taskIndex || !file) {
+        alert('Please fill in all fields.');
+        return;
+      }
+      const payload = {
+        name, email, taskIndex,
+        fileName: file.name,
+        timestamp: new Date().toISOString()
+      };
+      try {
+        const res = await fetch(\`\${APPS_SCRIPT_URL}?action=register\`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        if (result.success) {
+          alert('Submission recorded successfully.');
+          e.target.reset();
+        } else {
+          throw new Error('Server error');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Submission failed. Please try again later.');
+      }
+    });
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', fetchTasks);
+  </script>
+</body>
+</html>

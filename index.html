@@ -271,10 +271,9 @@
   <!-- …rest of your HTML above… -->
 
   <script>
-    // Use your new Web App URL here (no trailing ?action)
-    const BASE_URL = 'https://script.google.com/macros/s/AKfycbyzZsCVNdqN1P_hIrbb2FAAHvciNlGZcVzq9WZXiY7W4kjlr-rQRGPX3jeQbO0EhnKq/exec';
+    const BASE_URL = 'https://script.google.com/macros/s/AKfycbzf5zmEvlZiJRfC94v2kBVV9Q0p8Xr9RrSp7PSIZQbWkmDVTr8ockEBHpKvV_VicUvK/exec';
 
-    // Set footer year
+    // Footer year
     document.getElementById('currentYear').textContent = new Date().getFullYear();
 
     // Fetch & render tasks
@@ -282,9 +281,16 @@
       try {
         const res = await fetch(`${BASE_URL}?action=getTasks`);
         const { tasks } = await res.json();
-        const tbody = document.querySelector('#tasksTable tbody');
+        const tbody  = document.querySelector('#tasksTable tbody');
+        const select = document.getElementById('taskSelect');
+
+        // 1) Clear table & dropdown
         tbody.innerHTML = '';
+        select.innerHTML = '<option value="">— Choose a Task —</option>';
+
+        // 2) Populate both
         tasks.forEach((t, i) => {
+          // table row
           const tr = document.createElement('tr');
           tr.innerHTML = `
             <td>${t.name}</td>
@@ -292,51 +298,44 @@
             <td>${t.status}</td>
           `;
           tbody.appendChild(tr);
-        });
-        populateTaskSelect(tasks);
-      } catch (e) {
-        console.error('Error loading tasks:', e);
-      }
-    }
 
-    // Populate task dropdown
-    function populateTaskSelect(tasks) {
-      const select = document.getElementById('taskSelect');
-      // clear any existing sheet‑driven options
-      Array.from(select.options)
-           .filter(o => o.value && o.value !== '')
-           .forEach(o => select.removeChild(o));
-      tasks.forEach((t, i) => {
-        const opt = document.createElement('option');
-        opt.value = i;
-        opt.textContent = `${t.name} (Due: ${new Date(t.deadline).toLocaleDateString()})`;
-        select.appendChild(opt);
-      });
+          // dropdown option
+          const opt = document.createElement('option');
+          opt.value       = i;
+          opt.textContent = `${t.name} (Due: ${new Date(t.deadline).toLocaleDateString()})`;
+          select.appendChild(opt);
+        });
+      } catch (err) {
+        console.error('Error loading tasks:', err);
+      }
     }
 
     // Handle form submission
     document.getElementById('submissionForm').addEventListener('submit', async e => {
       e.preventDefault();
-      const name      = e.target.studentName.value.trim();
-      const email     = e.target.studentEmail.value.trim();
-      const taskIndex = e.target.taskSelect.value;
-      const file      = e.target.fileInput.files[0];
-      if (!name || !email || taskIndex === '' || !file) {
+      const name      = document.getElementById('studentName').value.trim();
+      const email     = document.getElementById('studentEmail').value.trim();
+      const taskIndex = document.getElementById('taskSelect').value;
+      const fileInput = document.getElementById('fileInput');
+
+      if (!name || !email || taskIndex === '' || !fileInput.files.length) {
         alert('Please fill in all fields.');
         return;
       }
+
       const payload = {
         action:    'register',
         name,
         email,
         taskIndex,
-        fileName:  file.name
+        fileName:  fileInput.files[0].name
       };
+
       try {
         const res = await fetch(BASE_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          method:  'POST',
+          headers: {'Content-Type':'application/json'},
+          body:    JSON.stringify(payload)
         });
         const result = await res.json();
         if (result.success) {
@@ -351,8 +350,8 @@
       }
     });
 
-    // Initialize on page load
     document.addEventListener('DOMContentLoaded', fetchTasks);
   </script>
+
 </body>
 </html>

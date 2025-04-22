@@ -270,88 +270,80 @@
 
   <!-- …rest of your HTML above… -->
 
-  <script>
-    const BASE_URL = 'https://script.google.com/macros/s/AKfycbzkYGh6iCkIHOwIcyDUzKl19aBORuxQSvtkECdnyLQEzDjF0joWumeadhxyaEyB7Pwl/exec';
+<script>
+  const BASE_URL = 'https://script.google.com/macros/s/AKfycbzaGIMzYtX99ToIOxzbdX6xScyI2bYBuDfIDsQvZPJMjPlQWcWvCocx-OHFjfZgV_ij/exec';
 
-    // Footer year
-    document.getElementById('currentYear').textContent = new Date().getFullYear();
+  // footer year
+  document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-    // Fetch & render tasks
-    async function fetchTasks() {
-      try {
-        const res = await fetch(`${BASE_URL}?action=getTasks`);
-        const { tasks } = await res.json();
-        const tbody  = document.querySelector('#tasksTable tbody');
-        const select = document.getElementById('taskSelect');
+  // fetch Tasks
+  async function fetchTasks() {
+    try {
+      const res = await fetch(BASE_URL);
+      const { tasks } = await res.json();
+      const tbody  = document.querySelector('#tasksTable tbody');
+      const select = document.getElementById('taskSelect');
 
-        // 1) Clear table & dropdown
-        tbody.innerHTML = '';
-        select.innerHTML = '<option value="">— Choose a Task —</option>';
+      tbody.innerHTML = '';
+      select.innerHTML = '<option value="">— Choose a Task —</option>';
 
-        // 2) Populate both
-        tasks.forEach((t, i) => {
-          // table row
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${t.name}</td>
-            <td>${new Date(t.deadline).toLocaleDateString()}</td>
-            <td>${t.status}</td>
-          `;
-          tbody.appendChild(tr);
+      tasks.forEach((t, i) => {
+        // populate table
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${t.name}</td>
+          <td>${new Date(t.deadline).toLocaleDateString()}</td>
+          <td>${t.status}</td>
+        `;
+        tbody.appendChild(tr);
+        // populate dropdown
+        const opt = document.createElement('option');
+        opt.value       = i;
+        opt.textContent = `${t.name} (Due: ${new Date(t.deadline).toLocaleDateString()})`;
+        select.appendChild(opt);
+      });
+    } catch (err) {
+      console.error('Error loading tasks:', err);
+    }
+  }
 
-          // dropdown option
-          const opt = document.createElement('option');
-          opt.value       = i;
-          opt.textContent = `${t.name} (Due: ${new Date(t.deadline).toLocaleDateString()})`;
-          select.appendChild(opt);
-        });
-      } catch (err) {
-        console.error('Error loading tasks:', err);
-      }
+  // handle submission
+  document.getElementById('submissionForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const name      = document.getElementById('studentName').value.trim();
+    const email     = document.getElementById('studentEmail').value.trim();
+    const taskIndex = document.getElementById('taskSelect').value;
+    const fileInput = document.getElementById('fileInput');
+
+    if (!name || !email || taskIndex === '' || !fileInput.files.length) {
+      alert('Please fill in all fields.');
+      return;
     }
 
-    // Handle form submission
-    document.getElementById('submissionForm').addEventListener('submit', async e => {
-      e.preventDefault();
-      const name      = document.getElementById('studentName').value.trim();
-      const email     = document.getElementById('studentEmail').value.trim();
-      const taskIndex = document.getElementById('taskSelect').value;
-      const fileInput = document.getElementById('fileInput');
+    const payload = { name, email, taskIndex, fileName: fileInput.files[0].name };
 
-      if (!name || !email || taskIndex === '' || !fileInput.files.length) {
-        alert('Please fill in all fields.');
-        return;
+    try {
+      const res = await fetch(BASE_URL, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload)
+      });
+      const result = await res.json();
+      if (result.success) {
+        alert('Submission recorded successfully.');
+        e.target.reset();
+      } else {
+        alert('Error: ' + (result.error || 'Submission failed.'));
       }
+    } catch (err) {
+      console.error(err);
+      alert('Submission failed. Please try again later.');
+    }
+  });
 
-      const payload = {
-        action:    'register',
-        name,
-        email,
-        taskIndex,
-        fileName:  fileInput.files[0].name
-      };
+  document.addEventListener('DOMContentLoaded', fetchTasks);
+</script>
 
-      try {
-        const res = await fetch(BASE_URL, {
-          method:  'POST',
-          headers: {'Content-Type':'application/json'},
-          body:    JSON.stringify(payload)
-        });
-        const result = await res.json();
-        if (result.success) {
-          alert('Submission recorded successfully.');
-          e.target.reset();
-        } else {
-          throw new Error(result.error || 'Server error');
-        }
-      } catch (err) {
-        console.error(err);
-        alert('Submission failed. Please try again later.');
-      }
-    });
-
-    document.addEventListener('DOMContentLoaded', fetchTasks);
-  </script>
 
 </body>
 </html>

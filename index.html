@@ -256,80 +256,95 @@
 
   <!-- …rest of your HTML above… -->
 
-<script>
-  const BASE_URL = 'https://script.google.com/macros/s/AKfycbzaGIMzYtX99ToIOxzbdX6xScyI2bYBuDfIDsQvZPJMjPlQWcWvCocx-OHFjfZgV_ij/exec';
+  <!-- …your HTML above… -->
 
-  // footer year
-  document.getElementById('currentYear').textContent = new Date().getFullYear();
+  <script>
+    // ←── Replace this with your actual Web App URL exactly as below ──→
+    const BASE_URL = 
+      'https://script.google.com/macros/s/AKfycbyecwI7ViS061kA1UUqdNGj-Mv_EVvZ5V266jb8R1wxT9NaKM2mLdjkTAJK9r4HxBTb/exec';
 
-  // fetch Tasks
-  async function fetchTasks() {
-    try {
-      const res = await fetch(BASE_URL);
-      const { tasks } = await res.json();
-      const tbody  = document.querySelector('#tasksTable tbody');
-      const select = document.getElementById('taskSelect');
+    // 1) Footer year
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-      tbody.innerHTML = '';
-      select.innerHTML = '<option value="">— Choose a Task —</option>';
+    // 2) Fetch & render tasks (GET)
+    async function fetchTasks() {
+      try {
+        const res = await fetch(BASE_URL);
+        const { tasks } = await res.json();
+        const tbody  = document.querySelector('#tasksTable tbody');
+        const select = document.getElementById('taskSelect');
 
-      tasks.forEach((t, i) => {
-        // populate table
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${t.name}</td>
-          <td>${new Date(t.deadline).toLocaleDateString()}</td>
-          <td>${t.status}</td>
-        `;
-        tbody.appendChild(tr);
-        // populate dropdown
-        const opt = document.createElement('option');
-        opt.value       = i;
-        opt.textContent = `${t.name} (Due: ${new Date(t.deadline).toLocaleDateString()})`;
-        select.appendChild(opt);
-      });
-    } catch (err) {
-      console.error('Error loading tasks:', err);
-    }
-  }
+        // clear out any existing rows/options
+        tbody.innerHTML  = '';
+        select.innerHTML = '<option value="">— Choose a Task —</option>';
 
-  // handle submission
-  document.getElementById('submissionForm').addEventListener('submit', async e => {
-    e.preventDefault();
-    const name      = document.getElementById('studentName').value.trim();
-    const email     = document.getElementById('studentEmail').value.trim();
-    const taskIndex = document.getElementById('taskSelect').value;
-    const fileInput = document.getElementById('fileInput');
+        tasks.forEach((t, i) => {
+          // table row
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${t.name}</td>
+            <td>${new Date(t.deadline).toLocaleDateString()}</td>
+            <td>${t.status}</td>
+          `;
+          tbody.appendChild(tr);
 
-    if (!name || !email || taskIndex === '' || !fileInput.files.length) {
-      alert('Please fill in all fields.');
-      return;
-    }
-
-    const payload = { name, email, taskIndex, fileName: fileInput.files[0].name };
-
-    try {
-      const res = await fetch(BASE_URL, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(payload)
-      });
-      const result = await res.json();
-      if (result.success) {
-        alert('Submission recorded successfully.');
-        e.target.reset();
-      } else {
-        alert('Error: ' + (result.error || 'Submission failed.'));
+          // dropdown option
+          const opt = document.createElement('option');
+          opt.value       = i;
+          opt.textContent = `${t.name} (Due: ${new Date(t.deadline).toLocaleDateString()})`;
+          select.appendChild(opt);
+        });
+      } catch (err) {
+        console.error('Error loading tasks:', err);
+        alert('Could not load tasks. Check console for details.');
       }
-    } catch (err) {
-      console.error(err);
-      alert('Submission failed. Please try again later.');
     }
-  });
 
-  document.addEventListener('DOMContentLoaded', fetchTasks);
-</script>
+    // 3) Handle form submission (POST)
+    document
+      .getElementById('submissionForm')
+      .addEventListener('submit', async e => {
+        e.preventDefault();
+        const name      = e.target.studentName.value.trim();
+        const email     = e.target.studentEmail.value.trim();
+        const taskIndex = e.target.taskSelect.value;
+        const fileInput = e.target.fileInput;
 
+        if (!name || !email || taskIndex === '' || !fileInput.files.length) {
+          alert('Please fill in all fields.');
+          return;
+        }
 
+        const payload = {
+          name,
+          email,
+          taskIndex,
+          fileName: fileInput.files[0].name
+        };
+
+        try {
+          const res    = await fetch(BASE_URL, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(payload)
+          });
+          const result = await res.json();
+          if (result.success) {
+            alert('✅ Submission recorded successfully.');
+            e.target.reset();
+          } else {
+            throw new Error(result.error || 'Unknown server error');
+          }
+        } catch (err) {
+          console.error('Submission error:', err);
+          alert('❌ Submission failed: ' + err.message);
+        }
+      });
+
+    // 4) Kick it off
+    document.addEventListener('DOMContentLoaded', fetchTasks);
+  </script>
 </body>
 </html>
+
+

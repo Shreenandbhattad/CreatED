@@ -187,7 +187,7 @@
   </header>
 
   <main>
-    <!-- Hero Section -->
+    <! Hero Section>
     <section class="hero">
       <div class="container">
         <h1>CreatED WorkTrack</h1>
@@ -195,7 +195,7 @@
       </div>
     </section>
 
-    <!-- Tasks Section -->
+    <!Tasks Section>
     <section id="tasks">
       <div class="container">
         <div class="content-card">
@@ -209,14 +209,14 @@
               </tr>
             </thead>
             <tbody>
-              <!-- JS will inject rows here -->
+              <!JS will inject rows here>
             </tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- Submission Section -->
+    <!Submission Section>
     <section id="submission">
       <div class="container">
         <div class="content-card">
@@ -251,22 +251,17 @@
   </main>
 
   <footer>
-    &copy; <span id="currentYear"></span> Your Institution. All rights reserved.
+    &copy; <span id="currentYear"></span> Your Institution. All rights reserved.CreatED
   </footer>
 
-  <!-- …rest of your HTML above… -->
-
-  <!-- …your HTML above… -->
-
 <script>
-  // ←– Paste your deployed Web App URL here (no query params!) –→
+
   const SCRIPT_URL = 
     'https://script.google.com/macros/s/AKfycbxuPdvRI2aPGwr7mqFEoAh6BeM4GjPqEI68p0V9TRmTBwie4G39U_0JQjlP8KAkDM4O/exec';
 
-  // 1) Footer year
+
   document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-  // 2) Load tasks via GET
   async function fetchTasks() {
     try {
       const res = await fetch(SCRIPT_URL);
@@ -284,7 +279,7 @@
           <td>${t.status}</td>
         `;
         tbody.appendChild(tr);
-        // Dropdown option
+        //Dropdown option
         const opt = document.createElement('option');
         opt.value       = i;
         opt.textContent = `${t.name} (Due: ${new Date(t.deadline).toLocaleDateString()})`;
@@ -296,7 +291,6 @@
     }
   }
 
-  // 3) Handle submission via FormData (no JSON, no preflight)
   document
     .getElementById('submissionForm')
     .addEventListener('submit', async e => {
@@ -312,7 +306,7 @@
         return;
       }
 
-      // Build FormData
+      //Build FormData
       const fd = new FormData();
       fd.append('name',      name);
       fd.append('email',     email);
@@ -323,22 +317,20 @@
         const resp   = await fetch(SCRIPT_URL, { method: 'POST', body: fd });
         const result = await resp.json();
         if (result.success) {
-          alert('✅ Submission recorded successfully.');
+          alert('Submission recorded successfully.');
           form.reset();
         } else {
           throw new Error(result.error || 'Server failure');
         }
       } catch (err) {
         console.error('Submission error:', err);
-        alert('❌ Submission failed: ' + err.message);
+        alert('Submission failed: ' + err.message);
       }
     });
 
-  // 4) Kickoff
+  //Kickoff
   document.addEventListener('DOMContentLoaded', fetchTasks);
 </script>
 
 </body>
 </html>
-
-

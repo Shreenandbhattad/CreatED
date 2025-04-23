@@ -258,108 +258,91 @@
 
   <!-- …your HTML above… -->
 
-  <script>
-    // ←── Replace this with your actual Web App URL exactly as below ──→
-    const BASE_URL = 
-      'https://script.google.com/macros/s/AKfycbyBjh2SFo1vAe74H6xXdjuDr2zMfvVFosubtLrdB1WwJDEbPOgQ3oiOefdeRFnQicbD/exec';
+<script>
+  // ←– After you deploy, drop your Web App URL here (no extra query params) –→
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzSgGQZfrc7hOH9cUYugt1akfrg3ytJFzekm79qIKn9SdQVts80wOfGO42lDrWCzcSL/exec';
 
-    // 1) Footer year
-    document.getElementById('currentYear').textContent = new Date().getFullYear();
+  // Set footer year
+  document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-    // 2) Fetch & render tasks (GET)
-    async function fetchTasks() {
-      try {
-        const res = await fetch(BASE_URL);
-        const { tasks } = await res.json();
-        const tbody  = document.querySelector('#tasksTable tbody');
-        const select = document.getElementById('taskSelect');
+  // 1) Load tasks into table & dropdown
+  async function fetchTasks() {
+    try {
+      const res = await fetch(SCRIPT_URL);
+      const { tasks } = await res.json();
+      const tbody  = document.querySelector('#tasksTable tbody');
+      const select = document.getElementById('taskSelect');
 
-        // clear out any existing rows/options
-        tbody.innerHTML  = '';
-        select.innerHTML = '<option value="">— Choose a Task —</option>';
+      // Clear existing
+      tbody.innerHTML  = '';
+      select.innerHTML = '<option value="">— Choose a Task —</option>';
 
-        tasks.forEach((t, i) => {
-          // table row
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${t.name}</td>
-            <td>${new Date(t.deadline).toLocaleDateString()}</td>
-            <td>${t.status}</td>
-          `;
-          tbody.appendChild(tr);
+      tasks.forEach((t, i) => {
+        // Table row
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${t.name}</td>
+          <td>${new Date(t.deadline).toLocaleDateString()}</td>
+          <td>${t.status}</td>
+        `;
+        tbody.appendChild(tr);
 
-          // dropdown option
-          const opt = document.createElement('option');
-          opt.value       = i;
-          opt.textContent = `${t.name} (Due: ${new Date(t.deadline).toLocaleDateString()})`;
-          select.appendChild(opt);
-        });
-      } catch (err) {
-        console.error('Error loading tasks:', err);
-        alert('Could not load tasks. Check console for details.');
-      }
-    }
-
-    // 3) Handle form submission (POST)
-    document
-      .getElementById('submissionForm')
-      .addEventListener('submit', async e => {
-        e.preventDefault();
-        const name      = e.target.studentName.value.trim();
-        const email     = e.target.studentEmail.value.trim();
-        const taskIndex = e.target.taskSelect.value;
-        const fileInput = e.target.fileInput;
-
-        if (!name || !email || taskIndex === '' || !fileInput.files.length) {
-          alert('Please fill in all fields.');
-          return;
-        }
-
-        const payload = {
-          name,
-          email,
-          taskIndex,
-          fileName: fileInput.files[0].name
-        };
-
-        try {
-          const res    = await fetch(BASE_URL, {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify(payload)
-          });
-          const result = await res.json();
-          if (result.success) {
-            alert('Submission recorded successfully.');
-            e.target.reset();
-          } else {
-            throw new Error(result.error || 'Unknown server error');
-          }
-        } catch (err) {
-          console.error('Submission error:', err);
-          alert('Submission failed: ' + err.message);
-        }
+        // Dropdown option
+        const opt = document.createElement('option');
+        opt.value       = i;
+        opt.textContent = `${t.name} (Due: ${new Date(t.deadline).toLocaleDateString()})`;
+        select.appendChild(opt);
       });
-
-    // 4) Kick it off
-    document.addEventListener('DOMContentLoaded', fetchTasks);
-
-    // …inside your submit handler…
-  const res = await fetch(BASE_URL, {
-    method:  'POST',
-    mode:    'cors',
-    headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify(payload)
-  });
-  const result = await res.json();
-  if (result.success) {
-    alert('Submission recorded successfully.');
-    e.target.reset();
-  } else {
-    alert('Error: ' + result.error);
+    } catch (err) {
+      console.error('Error loading tasks:', err);
+      alert('Could not load tasks—see console for details.');
+    }
   }
 
-  </script>
+  // 2) Handle “Upload Your Work” submissions
+  document.getElementById('submissionForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const name      = e.target.studentName.value.trim();
+    const email     = e.target.studentEmail.value.trim();
+    const taskIndex = e.target.taskSelect.value;
+    const fileInput = e.target.fileInput;
+
+    if (!name || !email || taskIndex === '' || !fileInput.files.length) {
+      alert('Please fill in all fields.');
+      return;
+    }
+
+    const payload = {
+      name,
+      email,
+      taskIndex,
+      fileName: fileInput.files[0].name
+    };
+
+    try {
+      const res    = await fetch(SCRIPT_URL, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload)
+      });
+      const result = await res.json();
+
+      if (result.success) {
+        alert('✅ Submission recorded successfully.');
+        e.target.reset();
+      } else {
+        throw new Error(result.error || 'Unknown server error');
+      }
+    } catch (err) {
+      console.error('Submission error:', err);
+      alert('❌ Submission failed: ' + err.message);
+    }
+  });
+
+  // 3) Initialize on page load
+  document.addEventListener('DOMContentLoaded', fetchTasks);
+</script>
+
 </body>
 </html>
 

@@ -261,7 +261,7 @@
   <script>
     // ←── Replace this with your actual Web App URL exactly as below ──→
     const BASE_URL = 
-      'https://script.google.com/macros/s/AKfycbyecwI7ViS061kA1UUqdNGj-Mv_EVvZ5V266jb8R1wxT9NaKM2mLdjkTAJK9r4HxBTb/exec';
+      'https://script.google.com/macros/s/AKfycbyBjh2SFo1vAe74H6xXdjuDr2zMfvVFosubtLrdB1WwJDEbPOgQ3oiOefdeRFnQicbD/exec';
 
     // 1) Footer year
     document.getElementById('currentYear').textContent = new Date().getFullYear();
@@ -330,14 +330,14 @@
           });
           const result = await res.json();
           if (result.success) {
-            alert('✅ Submission recorded successfully.');
+            alert('Submission recorded successfully.');
             e.target.reset();
           } else {
             throw new Error(result.error || 'Unknown server error');
           }
         } catch (err) {
           console.error('Submission error:', err);
-          alert('❌ Submission failed: ' + err.message);
+          alert('Submission failed: ' + err.message);
         }
       });
 

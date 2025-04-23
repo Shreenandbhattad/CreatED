@@ -343,6 +343,22 @@
 
     // 4) Kick it off
     document.addEventListener('DOMContentLoaded', fetchTasks);
+
+    // …inside your submit handler…
+  const res = await fetch(BASE_URL, {
+    method:  'POST',
+    mode:    'cors',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload)
+  });
+  const result = await res.json();
+  if (result.success) {
+    alert('Submission recorded successfully.');
+    e.target.reset();
+  } else {
+    alert('Error: ' + result.error);
+  }
+
   </script>
 </body>
 </html>
